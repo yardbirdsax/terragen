@@ -11,9 +11,11 @@ import (
 	"github.com/yardbirdsax/terragen/internal/terragrunt"
 )
 
-// DeploymentsFile represents a file containing a set of Deployments.
-type DeploymentsFile struct {
-	TerragruntDeployments []TerragruntDeployment     `hcl:"terragrunt_deployment,block"`
+// ConfigurationsFile represents a file containing a set of configurations.
+type ConfigurationsFile struct {
+	// These are used for generating Terragrunt root files.
+	TerragruntConfigurations []TerragruntConfiguration `hcl:"terragrunt_configuration,block"`
+	// These `include` blocks will be present in all generated files.
 	TerragruntIncludeAlls []terragrunt.IncludeConfig `hcl:"terragrunt_include_all,block"`
 }
 
@@ -25,12 +27,12 @@ func DecodeFromFile(filename string, out interface{}) error {
 	return generator.DecodeFromFile(filename, out)
 }
 
-func GenerateFromFile(deploymentsFilePath string) error {
+func GenerateFromFile(configurationsFilePath string) error {
 	generator, err := NewGenerator()
 	if err != nil {
 		return err
 	}
-	return generator.GenerateFromFile(deploymentsFilePath)
+	return generator.GenerateFromFile(configurationsFilePath)
 }
 
 func NewGenerator(optFns ...GeneratorOptsFn) (*Generator, error) {
@@ -64,24 +66,24 @@ func (g *Generator) DecodeFromFile(filename string, out interface{}) error {
 	return err
 }
 
-func (g *Generator) GenerateFromFile(deploymentsFilePath string) error {
-	deploymentsFile := &DeploymentsFile{}
-	err := DecodeFromFile(deploymentsFilePath, deploymentsFile)
+func (g *Generator) GenerateFromFile(configurationsFilePath string) error {
+	configurationsFile := &ConfigurationsFile{}
+	err := DecodeFromFile(configurationsFilePath, configurationsFile)
 	if err != nil {
 		return err
 	}
-	for _, tgDeployment := range deploymentsFile.TerragruntDeployments {
+	for _, configuration := range configurationsFile.TerragruntConfigurations {
 		generatedConfig := hclwrite.NewEmptyFile()
-		allIncludes := append(deploymentsFile.TerragruntIncludeAlls, tgDeployment.Includes...)
+		allIncludes := append(configurationsFile.TerragruntIncludeAlls, configuration.Includes...)
 		tgConfig := terragrunt.TerragruntConfig{
 			Terraform: terragrunt.TerraformConfig{
-				Source: tgDeployment.Source,
+				Source: configuration.Source,
 			},
 			IncludeConfigs: allIncludes,
 		}
 		gohcl.EncodeIntoBody(&tgConfig, generatedConfig.Body())
 
-		destFile, err := g.fs.Create(tgDeployment.DestinationPath)
+		destFile, err := g.fs.Create(configuration.DestinationPath)
 		if err != nil {
 			return err
 		}

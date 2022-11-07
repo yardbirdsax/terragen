@@ -17,13 +17,13 @@ func TestDecodeFile(t *testing.T) {
 	tests := []struct {
 		name           string
 		fileName       string
-		expectedOutput terragen.DeploymentsFile
+		expectedOutput terragen.ConfigurationsFile
 	}{
 		{
 			name:     "simple_terragrunt",
 			fileName: "simple_terragrunt.hcl",
-			expectedOutput: terragen.DeploymentsFile{
-				TerragruntDeployments: []terragen.TerragruntDeployment{
+			expectedOutput: terragen.ConfigurationsFile{
+				TerragruntConfigurations: []terragen.TerragruntConfiguration{
 					{
 						Name:            "test",
 						Source:          "mymodule",
@@ -49,7 +49,7 @@ func TestDecodeFile(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			actualOutput := terragen.DeploymentsFile{}
+			actualOutput := terragen.ConfigurationsFile{}
 			filePath := fmt.Sprintf("testdata/%s", tc.fileName)
 			err := terragen.DecodeFromFile(filePath, &actualOutput)
 

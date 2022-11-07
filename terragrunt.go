@@ -4,8 +4,8 @@ import (
 	"github.com/yardbirdsax/terragen/internal/terragrunt"
 )
 
-// TerragruntDeployment is a single configuration for the generation of a Terragrunt configuration.
-type TerragruntDeployment struct {
+// TerragruntConfiguration represents the information required for the generation of a Terragrunt configuration.
+type TerragruntConfiguration struct {
 	Name string `hcl:"name,label"`
 	// Source is the value passed for the `terraform` block's `source` attribute.
 	Source string `hcl:"source,attr"`

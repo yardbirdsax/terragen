@@ -8,7 +8,7 @@ generates the actual files for you.
 
 **Example Terragen configuration file:**
 ```hcl
-terragrunt_deployment "test" {
+terragrunt_configuration "test" {
   source = "mymodule"
   destination_path = "path/to/test/terragrunt.hcl"
   include "something" {

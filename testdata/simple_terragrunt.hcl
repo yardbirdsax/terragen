@@ -1,4 +1,4 @@
-terragrunt_deployment "test" {
+terragrunt_configuration "test" {
   source = "mymodule"
   destination_path = "path/to/test/terragrunt.hcl"
   include "something" {
