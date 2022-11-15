@@ -103,6 +103,67 @@ include "something" {
 	}
 }
 
+func TestGenerateFromConfig(t *testing.T) {
+	tests := []struct {
+		name                   string
+		config                 *terragen.ConfigurationsFile
+		expectedOutputFilePath string
+		expectedOutput         string
+	}{
+		{
+			name:                   "simple_terragrunt",
+			config: &terragen.ConfigurationsFile{
+				TerragruntConfigurations: []terragen.TerragruntConfiguration{
+					{
+						Name: "test",
+						Source: "mymodule",
+						DestinationPath: "path/to/test/terragrunt.hcl",
+						Includes: []terragrunt.IncludeConfig{
+							{
+								Name: "something",
+								Path: "hello",
+							},
+						},
+					},
+				},
+				TerragruntIncludeAlls: []terragrunt.IncludeConfig{
+					{
+						Name: "all",
+						Path: "world",
+					},
+				},
+			},
+			expectedOutputFilePath: "path/to/test/terragrunt.hcl",
+			expectedOutput: `
+terraform {
+  source = "mymodule"
+}
+
+include "all" {
+  path = "world"
+}
+include "something" {
+  path = "hello"
+}
+`,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			mockFs := afero.NewMemMapFs()
+			generator, err := terragen.NewGenerator(terragen.WithFs(mockFs))
+			require.NoError(t, err)
+
+			err = generator.GenerateFromConfig(tc.config)
+			require.NoError(t, err)
+
+			assertFileMatches(t, tc.expectedOutputFilePath, tc.expectedOutput, mockFs)
+		})
+	}
+}
+
 func copyFileToMockFs(source string, dest string, mockFs afero.Fs) error {
 	sourceFile, err := os.Open(source)
 	if err != nil {
