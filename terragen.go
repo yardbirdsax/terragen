@@ -72,9 +72,14 @@ func (g *Generator) GenerateFromFile(configurationsFilePath string) error {
 	if err != nil {
 		return err
 	}
-	for _, configuration := range configurationsFile.TerragruntConfigurations {
+	err = g.GenerateFromConfig(configurationsFile)
+	return err
+}
+
+func (g *Generator) GenerateFromConfig(config *ConfigurationsFile) error {
+	for _, configuration := range config.TerragruntConfigurations {
 		generatedConfig := hclwrite.NewEmptyFile()
-		allIncludes := append(configurationsFile.TerragruntIncludeAlls, configuration.Includes...)
+		allIncludes := append(config.TerragruntIncludeAlls, configuration.Includes...)
 		tgConfig := terragrunt.TerragruntConfig{
 			Terraform: terragrunt.TerraformConfig{
 				Source: configuration.Source,
