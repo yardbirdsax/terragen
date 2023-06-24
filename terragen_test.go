@@ -47,6 +47,7 @@ func TestDecodeFile(t *testing.T) {
 	}
 
 	for _, tc := range tests {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			actualOutput := terragen.ConfigurationsFile{}
@@ -86,6 +87,7 @@ include "something" {
 	}
 
 	for _, tc := range tests {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			mockFs := afero.NewMemMapFs()
@@ -150,6 +152,7 @@ include "something" {
 	}
 
 	for _, tc := range tests {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			mockFs := afero.NewMemMapFs()
